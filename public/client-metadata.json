@@ -1,0 +1,12 @@
+{
+  "client_id": "https://follow-yourself.benedikt.phd/client-metadata.json",
+  "client_name": "Follow Yourself on Bluesky",
+  "client_uri": "https://follow-yourself.benedikt.phd",
+  "redirect_uris": ["https://follow-yourself.benedikt.phd/"],
+  "grant_types": ["authorization_code", "refresh_token"],
+  "response_types": ["code"],
+  "scope": "atproto transition:generic",
+  "token_endpoint_auth_method": "none",
+  "application_type": "web",
+  "dpop_bound_access_tokens": true
+}

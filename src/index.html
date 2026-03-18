@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A fun tool to follow yourself on Bluesky. Lead by example - if you don't follow yourself, why should others?">
+    <meta name="keywords" content="bluesky, follow, self-follow, social media, bsky">
+    <meta name="author" content="Benedikt Kolbeinsson">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+
+    <link rel="canonical" href="https://follow-yourself.benedikt.phd/">
+
+    <meta property="og:title" content="Follow Yourself on Bluesky">
+    <meta property="og:site_name" content="Benedikt Kolbeinsson">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://follow-yourself.benedikt.phd/">
+    <meta property="og:description" content="A fun tool to follow yourself on Bluesky. Lead by example - if you don't follow yourself, why should others?">
+    <meta property="og:image" content="https://follow-yourself.benedikt.phd/banner.png">
+    <meta property="og:image:alt" content="Follow yourself on bluesky banner">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <title>Follow Yourself on Bluesky</title>
+    <style>
+        :root {
+            --bg-color: #111111;
+            --card-bg: #1a1a1a;
+            --text-color: #ffffff;
+            --text-secondary: #888888;
+            --border-color: #333333;
+            --primary-color: #0085ff;
+            --primary-hover: #0074e0;
+            --success-color: #34c759;
+            --success-hover: #2fb350;
+            --neutral-color: #2a2a2a;
+            --neutral-hover: #333333;
+            --error-color: #ff3b30;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--bg-color);
+            padding: 16px;
+            color: var(--text-color);
+            overflow: auto;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+        }
+
+        .slogan {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            box-sizing: border-box;
+            font-size: 15px;
+            transition: border-color 0.2s ease;
+            background-color: var(--neutral-color);
+            color: var(--text-color);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            position: relative;
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .loading::after {
+            content: "";
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            margin-top: -8px;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        #signInButton,
+        #followButton {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        #signInButton:not(:disabled):hover,
+        #followButton:not(:disabled):hover {
+            background-color: var(--primary-hover);
+        }
+
+        #unfollowButton {
+            background-color: var(--neutral-color);
+            color: var(--text-color);
+        }
+
+        #unfollowButton:not(:disabled):hover {
+            background-color: var(--neutral-hover);
+        }
+
+        #followBenediktButton {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        #followBenediktButton:not(:disabled):hover {
+            background-color: var(--success-hover);
+        }
+
+        #followBenediktButton.already-following {
+            background-color: var(--neutral-color);
+            color: var(--text-secondary);
+            opacity: 1;
+            cursor: default;
+        }
+
+        .follow-status {
+            text-align: center;
+            font-size: 13px;
+            margin-bottom: 12px;
+            min-height: 18px;
+        }
+
+        .follow-status.following {
+            color: var(--success-color);
+        }
+
+        .follow-status.not-following {
+            color: var(--text-secondary);
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 12px 0;
+        }
+
+        .signed-in-as {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .sign-out-link {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0;
+            margin: 4px auto 0;
+            display: block;
+            width: auto;
+            font-weight: 400;
+        }
+
+        .sign-out-link:hover {
+            color: var(--text-color);
+        }
+
+        #result {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 14px;
+            min-height: 20px;
+        }
+
+        .error {
+            color: var(--error-color);
+        }
+
+        .success {
+            color: var(--success-color);
+            animation: successPulse 0.4s ease-in-out;
+        }
+
+        .disclaimer {
+            margin-top: 24px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .disclaimer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .disclaimer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <h1>Follow Yourself on Bluesky</h1>
+            <p class="slogan">Lead by example — if you don't follow yourself, why should others?</p>
+        </div>
+
+        <div id="loginSection">
+            <div class="input-container">
+                <input type="text" id="handle" placeholder="username.bsky.social" autocomplete="off" spellcheck="false" autofocus>
+            </div>
+            <button id="signInButton">Sign in with Bluesky</button>
+        </div>
+
+        <div id="actionSection" style="display: none;">
+            <div class="signed-in-as">
+                Signed in as <strong id="displayHandle"></strong>
+                <button class="sign-out-link" id="signOutButton">Sign out</button>
+            </div>
+            <div id="followStatus" class="follow-status"></div>
+            <button id="followButton">Follow Yourself</button>
+            <button id="unfollowButton" style="display: none;">Unfollow Yourself</button>
+            <hr class="divider">
+            <button id="followBenediktButton">Follow @benedikt.phd</button>
+        </div>
+
+        <div id="result"></div>
+        <div class="disclaimer">
+            Made by <a href="https://bsky.app/profile/benedikt.phd" target="_blank" rel="noopener noreferrer">@benedikt.phd</a> · <a href="https://github.com/benediktkol/bsky-follow-yourself" target="_blank" rel="noopener noreferrer">Open source</a><br>
+            Authentication is handled securely via Bluesky's OAuth.
+        </div>
+    </div>
+    <script type="module" src="/app.js"></script>
+</body>
+</html>
