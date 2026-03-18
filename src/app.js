@@ -226,16 +226,9 @@ handleInput.addEventListener('keydown', (e) => {
 
 signOutButton.addEventListener('click', () => {
   agent = null
-  indexedDB.databases().then((dbs) => {
-    dbs.forEach((db) => {
-      if (db.name && db.name.startsWith('atproto-oauth')) {
-        indexedDB.deleteDatabase(db.name)
-      }
-    })
-    showLoggedOut()
-  }).catch(() => {
-    showLoggedOut()
-  })
+  localStorage.removeItem('@@atproto/oauth-client-browser(sub)')
+  indexedDB.deleteDatabase('@atproto-oauth-client')
+  showLoggedOut()
 })
 
 followButton.addEventListener('click', async () => {
